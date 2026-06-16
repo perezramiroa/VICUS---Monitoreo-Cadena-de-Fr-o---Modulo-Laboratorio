@@ -269,7 +269,6 @@
           </div>
           <div class="device-body">
             <div class="sensor-grid" id="g-${c.id}">Cargando...</div>
-            <div style="text-align: right; margin-top: 12px;"><button class="btn-del" onclick="del('${c.id}')">Eliminar</button></div>
           </div>
         `;
         app.appendChild(card);
@@ -286,7 +285,7 @@
               <div class="sensor-label" id="l-${c.id}-${f}">Cargando...</div>
               <div style="font-size:0.75rem; color:#64748b; margin-bottom:8px;">Reactivos (2 a 8°C)</div>
               <div class="sensor-value" id="v-${c.id}-${f}">--</div>
-              <button class="btn-info" onclick="toggleProtocolo()">ⓘ Protocolo</button>
+              <button id="info-${c.id}-${f}" class="btn-info" onclick="toggleProtocolo()" style="display:none;">ⓘ Protocolo</button>
               <button class="btn-hist" onclick="openRep('${c.id}','${c.k}','${f}')">📊 Reporte</button>
               <div id="t-${c.id}-${f}" style="font-size:0.7rem;color:#64748b;text-align:center;margin-top:4px;"></div>
             `;
@@ -357,6 +356,11 @@
 
             const cardEl = document.getElementById(`f-${c.id}-${f}`);
             if (cardEl) { cardEl.classList.toggle('danger', isDanger); }
+
+            const infoBtn = document.getElementById(`info-${c.id}-${f}`);
+            if (infoBtn) {
+              infoBtn.style.display = isDanger ? 'flex' : 'none';
+            }
           }
 
           const hasAnyAlert = Object.values(c.alertsState).some(state => state);
