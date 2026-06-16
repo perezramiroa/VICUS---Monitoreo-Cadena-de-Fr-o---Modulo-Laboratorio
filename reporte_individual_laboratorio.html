@@ -348,7 +348,7 @@
             // Usamos fetch con redirección manual para evitar problemas de CORS con Google Apps Script
             fetch(APPS_SCRIPT_Laboratorio, {
                 method: 'POST',
-                mode: 'cors',
+                mode: 'no-cors',
                 headers: { 'Content-Type': 'text/plain' },
                 body: JSON.stringify(payload)
             })
