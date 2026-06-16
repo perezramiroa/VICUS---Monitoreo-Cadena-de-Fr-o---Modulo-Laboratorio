@@ -204,11 +204,7 @@
       { id: '3027200', k: '9VCYTLGCB2Y8NZ28', n: 'Laboratorio Principal', type: 'laboratorio', fields: ['field1', 'field3'] } // field3 como wifi
     ];
 
-    let db = JSON.parse(localStorage.getItem('iot_db_laboratorio'));
-    if (!db || db.length === 0) {
-      db = JSON.parse(JSON.stringify(CANALES_DEFAULT));
-      localStorage.setItem('iot_db_laboratorio', JSON.stringify(db));
-    }
+    let db; try { db = JSON.parse(localStorage.getItem('iot_db_laboratorio')); if (!Array.isArray(db) || db.length === 0) throw new Error(); } catch (e) { db = JSON.parse(JSON.stringify(CANALES_DEFAULT)); localStorage.setItem('iot_db_laboratorio', JSON.stringify(db)); }
 
     function init() {
       render();
@@ -339,7 +335,7 @@
             let timeStr = '--';
             if (fTime) {
               const dt = new Date(fTime);
-              timeStr = \`\${dt.getDate()}/\${dt.getMonth()+1} \${dt.getHours()}:\${String(dt.getMinutes()).padStart(2,'0')}\`;
+              timeStr = `${dt.getDate()}/${dt.getMonth()+1} ${dt.getHours()}:${String(dt.getMinutes()).padStart(2,'0')}`;
             }
 
             const labelEl = document.getElementById(`l-${c.id}-${f}`);
@@ -392,3 +388,4 @@
   </script>
 </body>
 </html>
+
