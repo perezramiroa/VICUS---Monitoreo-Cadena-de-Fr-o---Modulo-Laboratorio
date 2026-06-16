@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Monitor Dataloggers - Laboratorio</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/png" href="./icons/icon-192x192.png">
+  <meta name="theme-color" content="#f97316">
+  <link rel="stylesheet" href="./css/pwa-styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    .header input,
+    .header select { padding: 12px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; }
+    .header input { flex: 1; min-width: 200px; }
+    .header input:focus, .header select:focus { outline: 2px solid var(--primary); border-color: transparent; }
+    .header button { padding: 12px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-add { background: var(--primary); color: white; }
+    .btn-add:hover { background: #2563eb; }
+    .btn-clear { background: #94a3b8; color: white; }
+    .btn-clear:hover { background: #64748b; }
+
+    .device-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+    .device-card {
+      background: white; border-radius: 8px; overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      border-left: 6px solid #f97316; /* Color Laboratorio (Naranja) */
+      transition: box-shadow 0.2s;
+    }
+    .device-card.alert { border-left-color: var(--danger); }
+    .device-card.power-outage { border: 2px solid var(--danger); animation: pulse 2s infinite; }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    .device-header { padding: 16px; background: white; font-weight: bold; font-size: 1.1rem; color: #1e293b; display: flex; justify-content: space-between; align-items: center; }
+    .type-badge { font-size: 0.8rem; padding: 4px 10px; border-radius: 12px; font-weight: 600; background-color: rgba(249, 115, 22, 0.15); color: #f97316; display: inline-flex; align-items: center; gap: 4px; }
+    .device-body { padding: 16px; background: white; }
+    .sensor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .sensor-card { background: white; padding: 14px 10px; border-radius: 8px; text-align: center; display: flex; flex-direction: column; border: 1px solid #e2e8f0; }
+    .sensor-card.danger { border-color: #ef4444; }
+    .sensor-label { font-size: 0.9rem; font-weight: 600; color: #475569; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; }
+    .sensor-value { font-size: 1.8rem; font-weight: bold; color: #1e293b; margin-bottom: 12px; }
+    .sensor-value.danger { color: #ef4444; }
+    .btn-hist { margin-top: auto; padding: 6px; width: 100%; border: none; background: #f97316; color: white; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn-hist:hover { background: #ea580c; }
+    .btn-info { margin-top: 6px; padding: 6px; width: 100%; border: none; background: #fef2f2; color: #dc2626; border-radius: 6px; cursor: pointer; font-size: 0.82rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 4px; border: 1px solid #fecaca; }
+    .btn-info:hover { background: #fee2e2; }
+    .btn-del { margin-top: 12px; padding: 6px 12px; border: 1px solid var(--border); background: transparent; color: #94a3b8; border-radius: 6px; font-size: 0.85rem; cursor: pointer; }
+    .btn-del:hover { color: var(--danger); border-color: var(--danger); }
+
+    .fields-selector { display: flex; gap: 12px; flex-wrap: wrap; margin: 8px 0; padding: 12px; background: #f1f5f9; border-radius: 8px; align-items: end; }
+    .field-config { display: flex; flex-direction: column; gap: 6px; }
+    .field-config label { font-weight: 600; font-size: 0.85rem; }
+
+    .page-title { text-align: center; font-size: 1.8rem; margin: 16px 0; color: var(--fg); font-weight: 600; background: var(--card-bg); padding: 12px 20px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); }
+
+    /* ── Botón y Modal Protocolo ── */
+    .btn-protocolo { background: #f97316; color: white; padding: 12px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-protocolo:hover { background: #ea580c; }
+    .protocolo-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 3000; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 20px 0; }
+    .protocolo-overlay.visible { display: flex; }
+    .protocolo-modal { background: white; border-radius: 14px; padding: 28px; max-width: 680px; width: 95%; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin: auto; }
+    .protocolo-modal h2 { color: #f97316; font-size: 1.2rem; margin-bottom: 4px; }
+    .protocolo-modal .subtitulo { font-size: 0.85rem; color: #64748b; font-style: italic; margin-bottom: 20px; }
+    .protocolo-seccion { margin-bottom: 20px; }
+    .protocolo-seccion h3 { font-size: 1rem; margin-bottom: 10px; padding: 6px 10px; border-radius: 6px; }
+    .protocolo-seccion h3.alta { background: #fee2e2; color: #dc2626; }
+    .protocolo-seccion h3.baja { background: #dbeafe; color: #1d4ed8; }
+    .protocolo-tabla { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .protocolo-tabla th { background: #f8fafc; padding: 8px 10px; text-align: left; font-weight: 600; border-bottom: 2px solid #e2e8f0; color: #1e293b; }
+    .protocolo-tabla td { padding: 8px 10px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+    .protocolo-nota-resp { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 12px; border-radius: 6px; font-size: 0.82rem; color: #92400e; margin-bottom: 16px; }
+    .btn-cerrar { width: 100%; margin-top: 14px; padding: 10px; background: #1e293b; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.95rem; }
+  </style>
+  <script src="./js/pwa-utils.js"></script>
+</head>
+
+<body onload="init()">
+  <div class="header">
+    <div class="logo-bar">
+      <div class="logo-item" style="width:100%;">
+        <img id="farmLogo" alt="RIH" style="width:100%; height:100%; max-height:100px; object-fit:contain;">
+        <script>document.getElementById('farmLogo').src = 'logos/logo_rih.jpg?t=' + new Date().getTime();</script>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:12px; flex-wrap:wrap; width:100%;">
+      <input type="text" id="urlIn" placeholder="Pega la URL del canal de ThingSpeak..." />
+      <div class="fields-selector">
+        <div class="field-config">
+            <label><input type="checkbox" id="field1Check" checked> Sensor 1 (2° a 8°C)</label>
+        </div>
+        <div class="field-config">
+            <label><input type="checkbox" id="field2Check"> Sensor 2 (2° a 8°C)</label>
+        </div>
+      </div>
+    </div>
+    <button class="btn-add" onclick="add()">Agregar</button>
+    <button class="btn-clear" onclick="wipe()">Borrar Todo</button>
+    <button class="btn-clear" onclick="toggleNormativa()">Normativa</button>
+    <button class="btn-protocolo" onclick="toggleProtocolo()">📋 Protocolo</button>
+  </div>
+  
+  <h1 class="page-title">Monitoreo de Cadena de Frío para Reactivos - Laboratorio</h1>
+  <div id="app" class="device-list"></div>
+  
+  <div style="margin-top: 8px; text-align: center;">
+    <div style="background-color: #00384d; padding: 6px 16px; border-top: 1px solid var(--border);">
+      <img id="farmFooter" alt="HNB - Provincia del Neuquén"
+        style="max-width: 100%; height: auto; display: inline-block;">
+      <script>document.getElementById('farmFooter').src = 'logos/footer.jpg?t=' + new Date().getTime();</script>
+    </div>
+  </div>
+
+  <div id="normativaPanel" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:1000; overflow:auto; padding:20px; box-sizing:border-box;">
+    <div style="max-width:900px; margin:0 auto;">
+      <div style="text-align:right; margin-bottom:20px;">
+        <button onclick="toggleNormativa()" style="padding:8px 16px; background:#ef4444; color:white; border:none; border-radius:6px; cursor:pointer;">Cerrar ✕</button>
+      </div>
+      <div style="text-align:center; margin-bottom:20px;">
+        <img src="logos/logo_rih.jpg" alt="RIH" style="max-height:80px; object-fit:contain;">
+        <h1 style="color:#1d4ed8; font-size:24px;">Marco Normativo – Laboratorio</h1>
+        <p>Sistemas de monitoreo | Vigencia: Enero 2026</p>
+      </div>
+      
+      <div style="background:#f8fafc; border-left:4px solid #f97316; padding:20px; border-radius:8px; margin-bottom:20px;">
+        <h2 style="font-size:20px; margin-bottom:16px; color:#f97316;">1. Normativa Nacional</h2>
+        <div style="background:white; padding:16px; border-radius:8px; margin-bottom:16px; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
+          <strong>ANMAT – Reactivos de Diagnóstico In Vitro</strong>
+          <p style="margin:8px 0;">Todo reactivo que requiera conservación entre 2°C y 8°C debe mantener ininterrumpidamente dicha temperatura para garantizar la viabilidad y especificidad de sus anticuerpos o componentes biológicos.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="protocoloModal" class="protocolo-overlay">
+    <div class="protocolo-modal">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <div>
+          <h2>Protocolo de Acción ante Desvíos de Temperatura</h2>
+          <div class="subtitulo">Reactivos Biológicos (2°C a 8°C)</div>
+        </div>
+        <button onclick="toggleProtocolo()" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:#94a3b8;">✕</button>
+      </div>
+
+      <div class="protocolo-nota-resp">
+        <strong>⚠️ Importante:</strong> Toda acción correctiva debe ser notificada inmediatamente al Servicio de Laboratorio y al Director Técnico correspondiente. No desechar ni usar ningún reactivo sin evaluación previa si se interrumpió la cadena de frío.
+      </div>
+
+      <div class="protocolo-seccion">
+        <h3 class="alta">🔺 Temperatura por ENCIMA de 8°C</h3>
+        <table class="protocolo-tabla">
+          <tr>
+            <th width="35%">Condición</th>
+            <th width="65%">Acciones a tomar</th>
+          </tr>
+          <tr>
+            <td><strong>Paso 1:</strong> Falla técnica</td>
+            <td>Verificar si la puerta quedó abierta o hubo un corte de luz.</td>
+          </tr>
+          <tr>
+            <td><strong>Paso 2:</strong> Cuarentena</td>
+            <td>Colocar cartel "EN EVALUACIÓN". No usar los reactivos para pruebas diagnósticas.</td>
+          </tr>
+          <tr>
+            <td><strong>Paso 3:</strong> Contingencia</td>
+            <td>Trasladar los reactivos afectados a una heladera de backup validada monitoreando la temperatura del traslado.</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="protocolo-seccion">
+        <h3 class="baja">🔻 Temperatura por DEBAJO de 2°C</h3>
+        <table class="protocolo-tabla">
+          <tr>
+            <th width="35%">Condición</th>
+            <th width="65%">Acciones a tomar</th>
+          </tr>
+          <tr>
+            <td><strong>Paso 1:</strong> Riesgo Congelación</td>
+            <td>Separar los reactivos y aislar aquellos que han estado en contacto con las paredes o el fondo del equipo refrigerador.</td>
+          </tr>
+          <tr>
+            <td><strong>Paso 2:</strong> Evaluación</td>
+            <td>La congelación puede precipitar proteínas y arruinar conjugados enzimáticos de forma irreversible. Descartar si el fabricante lo indica.</td>
+          </tr>
+        </table>
+      </div>
+
+      <button class="btn-cerrar" onclick="toggleProtocolo()">Entendido</button>
+    </div>
+  </div>
+
+  <script>
+    const WIFI_CUTOFF = 10;
+    const MAX = 8.0, MIN = 2.0;
+
+    const CANALES_DEFAULT = [
+      { id: '3027200', k: '9VCYTLGCB2Y8NZ28', n: 'Laboratorio Principal', type: 'laboratorio', fields: ['field1', 'field3'] } // field3 como wifi
+    ];
+
+    let db; try { db = JSON.parse(localStorage.getItem('iot_db_laboratorio')); if (!Array.isArray(db) || db.length === 0) throw new Error(); } catch (e) { db = JSON.parse(JSON.stringify(CANALES_DEFAULT)); localStorage.setItem('iot_db_laboratorio', JSON.stringify(db)); }
+
+    function init() {
+      render();
+      setInterval(refresh, 10000);
+      refresh();
+    }
+
+    function add() {
+      try {
+        const input = document.getElementById('urlIn').value.trim();
+        const f1 = document.getElementById('field1Check').checked;
+        const f2 = document.getElementById('field2Check').checked;
+        
+        const fields = [];
+        if (f1) fields.push('field1');
+        if (f2) fields.push('field2');
+
+        if (!input) return alert("Ingresa una URL.");
+        if (fields.length === 0) return alert("Selecciona al menos un sensor.");
+        
+        const u = new URL(input);
+        const k = u.searchParams.get('api_key');
+        const match = u.pathname.match(/channels\/(\d+)/);
+        const id = match ? match[1] : null;
+        if (!id || !k) throw new Error("Faltan ID o API key");
+        
+        fields.push('field3'); // WiFi implícito
+
+        if (!db.some(x => x.id == id)) {
+          db.push({ id, k, n: `ID: ${id}`, type: 'laboratorio', fields });
+          save();
+          render();
+          refresh();
+        }
+        document.getElementById('urlIn').value = "";
+      } catch (e) {
+        alert("URL inválida. Usa el enlace completo del canal con api_key.");
+      }
+    }
+
+    function wipe() {
+      if (confirm("¿Borrar todos los dispositivos?")) { db = []; save(); render(); }
+    }
+
+    function del(id) {
+      if (confirm("¿Está seguro?")) { db = db.filter(x => x.id != id); save(); render(); }
+    }
+
+    function save() { localStorage.setItem('iot_db_laboratorio', JSON.stringify(db)); }
+
+    function render() {
+      const app = document.getElementById('app');
+      app.innerHTML = "";
+      db.forEach(c => {
+        const card = document.createElement('div');
+        card.className = 'device-card';
+        card.id = `p-${c.id}`;
+        card.innerHTML = `
+          <div class="device-header">
+            <span id="n-${c.id}">${c.n}</span>
+            <span class="type-badge">Laboratorio 🧪</span>
+          </div>
+          <div class="device-body">
+            <div class="sensor-grid" id="g-${c.id}">Cargando...</div>
+          </div>
+        `;
+        app.appendChild(card);
+
+        if (c.fields && c.fields.length > 0) {
+          const grid = document.getElementById(`g-${c.id}`);
+          grid.innerHTML = "";
+          c.fields.forEach(f => {
+            if(f === 'field3') return;
+            const fieldCard = document.createElement('div');
+            fieldCard.className = 'sensor-card';
+            fieldCard.id = `f-${c.id}-${f}`;
+            fieldCard.innerHTML = `
+              <div class="sensor-label" id="l-${c.id}-${f}">Cargando...</div>
+              <div style="font-size:0.75rem; color:#64748b; margin-bottom:8px;">Reactivos (2 a 8°C)</div>
+              <div class="sensor-value" id="v-${c.id}-${f}">--</div>
+              <button id="info-${c.id}-${f}" class="btn-info" onclick="toggleProtocolo()" style="display:none;">ⓘ Protocolo</button>
+              <button class="btn-hist" onclick="openRep('${c.id}','${c.k}','${f}')">📊 Reporte</button>
+              <div id="t-${c.id}-${f}" style="font-size:0.7rem;color:#64748b;text-align:center;margin-top:4px;"></div>
+            `;
+            grid.appendChild(fieldCard);
+          });
+        }
+      });
+    }
+
+    function checkRecentPowerOutage(c, feeds) {
+      const now = new Date();
+      const h24 = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      for (let i = 1; i < feeds.length; i++) {
+        const prevTime = new Date(feeds[i - 1].created_at);
+        const currTime = new Date(feeds[i].created_at);
+        if (currTime < h24) continue;
+        if ((currTime - prevTime) / 60000 > WIFI_CUTOFF) return true;
+      }
+      return false;
+    }
+
+    async function refresh() {
+      for (let c of db) {
+        if (!c.alertsState) c.alertsState = {};
+        try {
+          const url = `https://api.thingspeak.com/channels/${c.id}/feeds.json?api_key=${c.k}&results=100`;
+          const r = await fetch(url);
+          const d = await r.json();
+          if (!d.channel || !d.feeds || d.feeds.length === 0) continue;
+          
+          c.n = d.channel.name || `ID: ${c.id}`;
+          const nameEl = document.getElementById(`n-${c.id}`);
+          if (nameEl) nameEl.innerText = c.n;
+
+          for (let f of c.fields) {
+            if(f === 'field3') continue;
+            const fLabel = d.channel[f] || f;
+            let fValue = NaN;
+            let fTime = null;
+            
+            for (let i = d.feeds.length - 1; i >= 0; i--) {
+              const v = parseFloat(d.feeds[i][f]);
+              if (!isNaN(v) && v !== -127) { fValue = v; fTime = d.feeds[i].created_at; break; }
+            }
+
+            let timeStr = '--';
+            if (fTime) {
+              const dt = new Date(fTime);
+              timeStr = `${dt.getDate()}/${dt.getMonth()+1} ${dt.getHours()}:${String(dt.getMinutes()).padStart(2,'0')}`;
+            }
+
+            const labelEl = document.getElementById(`l-${c.id}-${f}`);
+            const valueEl = document.getElementById(`v-${c.id}-${f}`);
+            if (labelEl) labelEl.innerText = fLabel;
+            
+            if (valueEl) {
+              if (isNaN(fValue)) { valueEl.innerHTML = `<span style="font-size:1rem;color:#94a3b8;">Sin datos</span>`; } 
+              else { valueEl.innerText = fValue.toFixed(1) + '°C'; }
+              if (!isNaN(fValue) && (fValue < MIN || fValue > MAX)) { valueEl.classList.add('danger'); } 
+              else { valueEl.classList.remove('danger'); }
+            }
+
+            const timeEl = document.getElementById(`t-${c.id}-${f}`);
+            if (timeEl) timeEl.innerText = fTime ? `🕒 ${timeStr}` : '';
+
+            const isDanger = !isNaN(fValue) && (fValue > MAX || fValue < MIN);
+            c.alertsState[f] = isDanger;
+
+            const cardEl = document.getElementById(`f-${c.id}-${f}`);
+            if (cardEl) { cardEl.classList.toggle('danger', isDanger); }
+
+            const infoBtn = document.getElementById(`info-${c.id}-${f}`);
+            if (infoBtn) {
+              infoBtn.style.display = isDanger ? 'flex' : 'none';
+            }
+          }
+
+          const hasAnyAlert = Object.values(c.alertsState).some(state => state);
+          const card = document.getElementById(`p-${c.id}`);
+          if (card) {
+            card.classList.toggle('alert', hasAnyAlert);
+            const hasPowerOutage = checkRecentPowerOutage(c, d.feeds);
+            card.classList.toggle('power-outage', hasPowerOutage);
+          }
+          save();
+        } catch (e) { console.warn(`Error al cargar canal ${c.id}:`, e); }
+      }
+    }
+
+    function openRep(id, k, f) {
+      window.open(`reporte_individual_laboratorio.html?id=${id}&key=${k}&field=${f}&days=7`, '_blank');
+    }
+
+    function toggleNormativa() {
+      const panel = document.getElementById('normativaPanel');
+      panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function toggleProtocolo() {
+      const modal = document.getElementById('protocoloModal');
+      modal.classList.toggle('visible');
+    }
+
+  </script>
+</body>
+</html>
+
