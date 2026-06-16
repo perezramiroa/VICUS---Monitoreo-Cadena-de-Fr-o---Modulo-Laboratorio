@@ -1,0 +1,27 @@
+{
+  "name": "Monitoreo Cadena de Frío - Farmacia",
+  "short_name": "Farmacia",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#00384d",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "./icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["health", "utilities", "productivity"],
+  "description": "Sistema de monitoreo de cadena de frío para Farmacia - Hospital Natalio Burd"
+}
+
