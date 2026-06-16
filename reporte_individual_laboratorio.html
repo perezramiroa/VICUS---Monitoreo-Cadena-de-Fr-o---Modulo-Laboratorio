@@ -515,7 +515,7 @@
                 doc.setFontSize(16);
                 doc.setFont('helvetica', 'bold');
                 doc.setTextColor(0, 56, 77);
-                const title = "INFORME TECNICO DE CADENA DE FRIO - REACTIVOS DE DIAGNÓSTICO IN VITRO";
+                const title = "INFORME TECNICO DE CADENA DE FRIO - REACTIVOS";
                 doc.setFontSize(14); // Reducimos de 16 a 14
                 const splitTitle = doc.splitTextToSize(title, pageWidth - (margin * 2));
                 doc.text(splitTitle, margin, yPos);
@@ -916,7 +916,7 @@
                 const infoData = await infoRes.json();
                 document.getElementById('sensorName').innerText = infoData.channel[FIELD] || "Sensor";
                 const teamNameEl = document.getElementById('teamName');
-                teamNameEl.innerHTML = `Laboratorio ðŸ’Š: ${infoData.channel.name || "Sin nombre"}`;
+                teamNameEl.innerHTML = `Equipo: ${infoData.channel.name || "Sin nombre"}`;
                 teamNameEl.className = "tag Laboratorio-tag";
 
                 currentFeeds = feeds.filter(f => parseFloat(f[FIELD]) !== -127);
