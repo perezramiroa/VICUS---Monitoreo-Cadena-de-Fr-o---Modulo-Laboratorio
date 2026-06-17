@@ -1131,7 +1131,7 @@
             analisis += `• Incidentes de frío (<2°C): ${alertasBajas}\n`;
 
             if (alertasBajas > 0) {
-                analisis += "\n⚠ ADVERTENCIA CRÍTICA: Se detectó riesgo de CONGELACIÓN. La exposición a temperaturas inferiores a 2°C puede inactivar de forma irreversible medicamentos termolábiles (insulinas, vacunas, biotecnológicos). Requiere evaluación urgente.\n";
+                analisis += "\n⚠ ADVERTENCIA CRÍTICA: Se detectó riesgo de CONGELACIÓN. La exposición a temperaturas inferiores a 2°C puede inactivar de forma irreversible reactivos termolábiles y conjugados enzimáticos. Requiere evaluación urgente.\n";
             }
 
             if (totalDuracion < 30) {
@@ -1139,7 +1139,7 @@
             } else if (totalDuracion < 120) {
                 analisis += "\nDesvío térmico moderado. Se recomienda formalizar la novedad en el registro de incidencias y consultar con el responsable de Laboratorio.";
             } else {
-                analisis += "\nDESVÍO CRÍTICO Y PROLONGADO: Apartar de forma preventiva los medicamentos afectados con rótulo 'NO DISPENSAR - EN EVALUACIÓN' y notificar de inmediato a la Jefatura de Laboratorio. Evaluar según Disposición ANMAT 10.872/2020.";
+                analisis += "\nDESVÍO CRÍTICO Y PROLONGADO: Apartar de forma preventiva los reactivos afectados con rótulo 'NO USAR - EN EVALUACIÓN' y notificar de inmediato a la Jefatura de Laboratorio. Evaluar especificaciones del fabricante.";
             }
             return analisis;
         }
@@ -1155,11 +1155,11 @@
             if (tieneAltas) {
                 recom.push("• Calor excesivo: Comprobar el cierre magnético de las puertas y la limpieza del radiador externo del motor.");
                 recom.push("• Controlar el termostato y el estado del compresor (causas más frecuentes de temperatura alta).");
-                recom.push("• Evaluar la aptitud de los medicamentos afectados según Disposición ANMAT 10.872/2020.");
+                recom.push("• Evaluar la aptitud de los reactivos afectados según las instrucciones del fabricante.");
             }
             if (tieneBajas) {
                 recom.push("• Frío extremo: Revisar la configuración del termostato del equipo.");
-                recom.push("• Verificar que los medicamentos no estén en contacto directo con el evaporador.");
+                recom.push("• Verificar que los reactivos no estén en contacto directo con el evaporador.");
                 recom.push("• Controlar que la puerta no haya quedado abierta en ambiente frío.");
             }
             recom.push("• Registrar el incidente en el libro de control de temperatura firmado por el responsable.");
