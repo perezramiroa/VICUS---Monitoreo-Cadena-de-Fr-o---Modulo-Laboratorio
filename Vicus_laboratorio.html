@@ -7,7 +7,7 @@
   <title>Monitor Dataloggers - Laboratorio</title>
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" type="image/png" href="./icons/icon-192x192.png">
-  <meta name="theme-color" content="#f97316">
+  <meta name="theme-color" content="#00384d">
   <link rel="stylesheet" href="./css/pwa-styles.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
@@ -25,7 +25,7 @@
     .device-card {
       background: white; border-radius: 8px; overflow: hidden;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-      border-left: 6px solid #f97316; /* Color Laboratorio (Naranja) */
+      border-left: 6px solid #00384d; /* Color Laboratorio (Azul oscuro) */
       transition: box-shadow 0.2s;
     }
     .device-card.alert { border-left-color: var(--danger); }
@@ -38,16 +38,16 @@
     }
 
     .device-header { padding: 16px; background: white; font-weight: bold; font-size: 1.1rem; color: #1e293b; display: flex; justify-content: space-between; align-items: center; }
-    .type-badge { font-size: 0.8rem; padding: 4px 10px; border-radius: 12px; font-weight: 600; background-color: rgba(249, 115, 22, 0.15); color: #f97316; display: inline-flex; align-items: center; gap: 4px; }
+    .type-badge { font-size: 0.8rem; padding: 4px 10px; border-radius: 12px; font-weight: 600; background-color: rgba(0, 56, 77, 0.15); color: #00384d; display: inline-flex; align-items: center; gap: 4px; }
     .device-body { padding: 16px; background: white; }
     .sensor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .sensor-card { background: white; padding: 14px 10px; border-radius: 8px; text-align: center; display: flex; flex-direction: column; border: 1px solid #e2e8f0; }
-    .sensor-card.danger { border-color: #ef4444; }
+    .sensor-card.danger { border-color: #ef4444; box-shadow: inset 0 0 0 1px #ef4444; }
     .sensor-label { font-size: 0.9rem; font-weight: 600; color: #475569; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; }
     .sensor-value { font-size: 1.8rem; font-weight: bold; color: #1e293b; margin-bottom: 12px; }
     .sensor-value.danger { color: #ef4444; }
-    .btn-hist { margin-top: auto; padding: 6px; width: 100%; border: none; background: #f97316; color: white; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; }
-    .btn-hist:hover { background: #ea580c; }
+    .btn-hist { margin-top: auto; padding: 6px; width: 100%; border: none; background: #00384d; color: white; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn-hist:hover { background: #1e293b; }
     .btn-info { margin-top: 6px; padding: 6px; width: 100%; border: none; background: #fef2f2; color: #dc2626; border-radius: 6px; cursor: pointer; font-size: 0.82rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 4px; border: 1px solid #fecaca; }
     .btn-info:hover { background: #fee2e2; }
     .btn-del { margin-top: 12px; padding: 6px 12px; border: 1px solid var(--border); background: transparent; color: #94a3b8; border-radius: 6px; font-size: 0.85rem; cursor: pointer; }
