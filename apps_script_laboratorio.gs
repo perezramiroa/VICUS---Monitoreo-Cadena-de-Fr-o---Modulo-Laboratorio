@@ -115,10 +115,10 @@ function generarPDFOficial(sensor, fecha, rango, trazabilidad, analizada, conect
     const hp = header.getParagraphs()[0];
     hp.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
     hp.appendInlineImage(logo).setWidth(anchoMax).setHeight(60);
-    hp.setSpacingBefore(0).setSpacingAfter(0);
+    hp.setSpacingBefore(0).setSpacingAfter(10);
   } else {
     const hp = header.getParagraphs()[0];
-    hp.setText("").setSpacingBefore(0).setSpacingAfter(0);
+    hp.setText("").setSpacingBefore(0).setSpacingAfter(10);
   }
   header.appendHorizontalRule();
 
@@ -191,9 +191,9 @@ function generarPDFOficial(sensor, fecha, rango, trazabilidad, analizada, conect
   if (logoF) {
     fp.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
     fp.appendInlineImage(logoF).setWidth(anchoMax).setHeight(50);
-    fp.setSpacingBefore(0).setSpacingAfter(0);
+    fp.setSpacingBefore(10).setSpacingAfter(0);
   } else {
-    fp.setText("").setSpacingBefore(0).setSpacingAfter(0);
+    fp.setText("").setSpacingBefore(10).setSpacingAfter(0);
   }
 
   doc.saveAndClose();
