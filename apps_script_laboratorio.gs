@@ -112,13 +112,9 @@ function generarPDFOficial(sensor, fecha, rango, trazabilidad, analizada, conect
   const logo   = buscarLogoEnDrive("logo_rih.jpg");
   const header = doc.addHeader();
   if (logo) {
-    const hp = header.getParagraphs()[0];
+    const hp = header.appendParagraph("");
     hp.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
     hp.appendInlineImage(logo).setWidth(anchoMax).setHeight(60);
-    hp.setSpacingBefore(0).setSpacingAfter(10);
-  } else {
-    const hp = header.getParagraphs()[0];
-    hp.setText("").setSpacingBefore(0).setSpacingAfter(10);
   }
   header.appendHorizontalRule();
 
@@ -183,17 +179,14 @@ function generarPDFOficial(sensor, fecha, rango, trazabilidad, analizada, conect
   pResp.setBold(true).setFontSize(9).setForegroundColor("#475569");
   body.appendParagraph(analizada.notaResponsabilidad).setFontSize(8).setItalic(true).setForegroundColor("#475569");
 
-  // Pie de página
+  // Pie de página con línea separadora
   const footer = doc.addFooter();
-  footer.insertHorizontalRule(0);
-  const fp = footer.getParagraphs()[0];
+  footer.appendHorizontalRule();
   const logoF = buscarLogoEnDrive("footer.jpg");
   if (logoF) {
+    const fp = footer.appendParagraph("");
     fp.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
     fp.appendInlineImage(logoF).setWidth(anchoMax).setHeight(50);
-    fp.setSpacingBefore(10).setSpacingAfter(0);
-  } else {
-    fp.setText("").setSpacingBefore(10).setSpacingAfter(0);
   }
 
   doc.saveAndClose();
