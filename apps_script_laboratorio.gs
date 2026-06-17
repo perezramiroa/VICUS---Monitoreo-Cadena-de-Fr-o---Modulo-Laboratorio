@@ -12,8 +12,8 @@ const CONFIG_LABORATORIO = {
 };
 
 const SENSORES = [
-  { id: '3027200', k: '9VCYTLGCB2Y8NZ28', n: 'Laboratorio Principal - Sensor 1', eq: 'Heladera Laboratorio 1', field: 'field1', subtype: 'reactivos' },
-  { id: '3027200', k: '9VCYTLGCB2Y8NZ28', n: 'Laboratorio Principal - Sensor 2', eq: 'Heladera Laboratorio 2', field: 'field2', subtype: 'reactivos' }
+  { id: '3027200', k: '9VCYTLGCB2Y8NZ28', n: 'Laboratorio Principal - Sensor 1', eq: 'Briket NHC12246', field: 'field1', subtype: 'reactivos' },
+  { id: '3027200', k: '9VCYTLGCB2Y8NZ28', n: 'Laboratorio Principal - Sensor 2', eq: 'Inelro NHC12288', field: 'field2', subtype: 'reactivos' }
 ];
 
 // =====================================================================
@@ -112,9 +112,12 @@ function generarPDFOficial(sensor, fecha, rango, trazabilidad, analizada, conect
   const logo   = buscarLogoEnDrive("logo_rih.jpg");
   const header = doc.addHeader();
   if (logo) {
-    const hp = header.appendParagraph("");
+    const hp = header.getParagraphs()[0];
     hp.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
     hp.appendInlineImage(logo).setWidth(anchoMax).setHeight(60);
+    hp.setSpacingBefore(0).setSpacingAfter(0);
+  } else {
+    header.getParagraphs()[0].removeFromParent();
   }
   header.appendHorizontalRule();
 
@@ -181,12 +184,16 @@ function generarPDFOficial(sensor, fecha, rango, trazabilidad, analizada, conect
 
   // Pie de página
   const footer = doc.addFooter();
+  if (footer.getParagraphs().length > 0) {
+    footer.getParagraphs()[0].removeFromParent();
+  }
   footer.appendHorizontalRule();
   const logoF = buscarLogoEnDrive("footer.jpg");
   if (logoF) {
     const fp = footer.appendParagraph("");
     fp.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
     fp.appendInlineImage(logoF).setWidth(anchoMax).setHeight(50);
+    fp.setSpacingBefore(0).setSpacingAfter(0);
   }
 
   doc.saveAndClose();
