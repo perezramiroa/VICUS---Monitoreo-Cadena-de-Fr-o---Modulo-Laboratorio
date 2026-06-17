@@ -119,7 +119,7 @@ function generarPDFOficial(sensor, fecha, rango, trazabilidad, analizada, conect
   header.appendHorizontalRule();
 
   // Título
-  const t1 = body.appendParagraph("INFORME TÉCNICO DE CADENA DE FRÍO - MONITOREO DE VACUNAS");
+  const t1 = body.appendParagraph("INFORME TÉCNICO DE CADENA DE FRÍO - LABORATORIO");
   t1.setFontSize(14).setBold(true).setForegroundColor("#00384d").setSpacingAfter(4);
 
   body.appendParagraph("Según Disposición ANMAT 10.872/2020")
