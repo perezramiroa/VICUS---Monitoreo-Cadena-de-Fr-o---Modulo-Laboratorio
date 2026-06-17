@@ -117,7 +117,8 @@ function generarPDFOficial(sensor, fecha, rango, trazabilidad, analizada, conect
     hp.appendInlineImage(logo).setWidth(anchoMax).setHeight(60);
     hp.setSpacingBefore(0).setSpacingAfter(0);
   } else {
-    header.getParagraphs()[0].removeFromParent();
+    const hp = header.getParagraphs()[0];
+    hp.setText("").setSpacingBefore(0).setSpacingAfter(0);
   }
   header.appendHorizontalRule();
 
@@ -184,16 +185,15 @@ function generarPDFOficial(sensor, fecha, rango, trazabilidad, analizada, conect
 
   // Pie de página
   const footer = doc.addFooter();
-  if (footer.getParagraphs().length > 0) {
-    footer.getParagraphs()[0].removeFromParent();
-  }
-  footer.appendHorizontalRule();
+  footer.insertHorizontalRule(0);
+  const fp = footer.getParagraphs()[0];
   const logoF = buscarLogoEnDrive("footer.jpg");
   if (logoF) {
-    const fp = footer.appendParagraph("");
     fp.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
     fp.appendInlineImage(logoF).setWidth(anchoMax).setHeight(50);
     fp.setSpacingBefore(0).setSpacingAfter(0);
+  } else {
+    fp.setText("").setSpacingBefore(0).setSpacingAfter(0);
   }
 
   doc.saveAndClose();
