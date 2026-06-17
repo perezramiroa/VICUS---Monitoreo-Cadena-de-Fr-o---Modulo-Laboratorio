@@ -1,15 +1,17 @@
-const CACHE_NAME = 'lab-v1.0.1';
+const CACHE_NAME = 'lab-v1.0.2';
 const PREFIX = '.';
 const urlsToCache = [
   `${PREFIX}/`,
-  `${PREFIX}/index.html`,
   `${PREFIX}/index.html`,
   `${PREFIX}/reporte_individual_laboratorio.html`,
   `${PREFIX}/css/pwa-styles.css`,
   `${PREFIX}/js/pwa-utils.js`,
   `${PREFIX}/logos/logo_rih.jpg`,
   `${PREFIX}/logos/footer.jpg`,
-  `${PREFIX}/logos/portal-vicus.png`
+  `${PREFIX}/logos/portal-vicus.png`,
+  `${PREFIX}/manifest.json`,
+  `${PREFIX}/icons/icon-192x192.png`,
+  `${PREFIX}/icons/icon-512x512.png`
 ];
 
 // Instalación del Service Worker
